@@ -1,0 +1,1197 @@
+<html>
+	<head>
+		<style>
+			body{
+				background-color:#23A;
+			}
+			#display{
+				background-color:#555;
+				border: #555 solid 5px;
+			}
+			
+			#holdCanvas{
+				background-color:#555;
+				border: #555 solid 5px; 
+			}
+			
+			#scoreText{
+				position:relative;
+				left: 50%;
+    			transform: translateX(-50%);
+				top:15px;
+			}
+				
+			#nextCanvas{
+				background-color:#555;
+				border: #555 solid 5px;
+			}
+				
+			.canvas{
+				height:90%;
+				width:100%;
+				display:flex;
+				justify-content: center;
+				align-items: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="canvas">
+			<canvas id="holdCanvas" width="100px" height="600px"></canvas>
+			<canvas id="display" width="300px" height="600px"></canvas>
+			<canvas id="nextCanvas" width="100px" height="600px"></canvas>
+		</div>
+		<canvas id="scoreText" width="270px" height="60px"></canvas>
+		<script>
+			var display = document.getElementById("display");
+			var holdCanvas = document.getElementById("holdCanvas");
+			var nextCanvas = document.getElementById("nextCanvas");
+			var scoreText = document.getElementById("scoreText");
+			var ctx = display.getContext("2d");
+			var ctx2 = holdCanvas.getContext("2d");
+			var ctx3 = nextCanvas.getContext("2d");
+			var ctx4 = scoreText.getContext("2d");
+			var color = [
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+						 			[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0],
+									[0,0,0,0,0,0,0,0,0,0,0,0]
+								];
+			var wall = [
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+						 			[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,8,8,8,8,8,8,8,8,8,8,8]
+								];
+			var wallS = [
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+						 			[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,0,0,0,0,0,0,0,0,0,0,8],
+									[8,8,8,8,8,8,8,8,8,8,8,8]
+								];
+			var textDeta = [
+										[9,9,9,9,8,9,9,8,9,9,8,9,9,9,9],//0
+										[8,8,1,8,8,1,8,8,1,8,8,1,8,8,1],//1
+										[2,2,2,8,8,2,2,2,2,2,8,8,2,2,2],//2
+										[3,3,3,8,8,3,3,3,3,8,8,3,3,3,3],//3
+										[4,8,4,4,8,4,4,4,4,8,8,4,8,8,4],//4
+										[5,5,5,5,8,8,5,5,5,8,8,5,5,5,5],//5
+										[6,6,6,6,8,8,6,6,6,6,8,6,6,6,6],//6
+										[7,7,7,7,8,7,7,8,7,8,8,7,8,8,7],//7
+										[10,10,10,10,8,10,10,10,10,10,8,10,10,10,10],//8
+										[11,11,11,11,8,11,11,11,11,8,8,11,11,11,11]//9
+											]
+			var colors = ["AAA","FAE800","7F61B1","59B0FC","3552FF","FFA22A","12FF14","FF1214","23A","59B0FC","FAE800","7F61B1"];
+			var shapeType = ["N","O","T","I","J","L","S","Z"];
+			var fps = 1000;
+			var frame = 0;
+			var key = 0;
+			var score = 0;
+			var checked = false;
+			var checked2 = false;
+			var checked3 = false;
+			var holdCheck = false;
+			var eraseLine = 0;
+			var mino = {
+				X : 4,
+				Y : 0,
+				dir : 1,
+				Dir : 0,
+				Ren : 0,
+				next : [0,0,0,0,0,0,0],
+				now : 0,
+				type : [1,2,3,4,5,6,7],
+				hold : 0,
+				hold2 : 0,
+				shape : {
+					N : [
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0]
+					],
+					O : [
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,0,1,1,0,0],
+						[0,0,1,1,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0]
+					],
+					T : [
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,0,2,0,0,0],
+						[0,2,2,2,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0]
+					],
+					I : [
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,3,3,3,3,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0]
+					],
+					J : [
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,4,0,0,0,0],
+						[0,4,4,4,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0]
+					],
+					L : [
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,5,0,0],
+						[0,5,5,5,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0]
+					],
+					S : [
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,0,6,6,0,0],
+						[0,6,6,0,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0]
+					],
+					Z : [
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0],
+						[0,7,7,0,0,0],
+						[0,0,7,7,0,0],
+						[0,0,0,0,0,0],
+						[0,0,0,0,0,0]
+					]
+				}
+			}
+			
+			newnextmino();
+			
+			holdWhite();
+			
+			function newnextmino() {
+				var random;
+				while (mino.type.length != 0) {
+					for (var i = 0; i < 7; i++) {
+						random = Math.floor(Math.random()*mino.type.length);
+						mino.next[i] = mino.type[random];
+						mino.type.splice(random,1);
+					}
+				}
+				newmino(0);
+			}
+			
+			function newmino(n) {
+				if (n == 0) {	
+					mino.X = 5;
+					mino.Y = 0;
+					mino.dir = 1;
+					mino.now = mino.next[0];
+					for (var i = 0; i < 7; i++) {
+						mino.next[i] = mino.next[i+1];
+					}
+					
+					mino.next[6] = Math.floor(Math.random()*7+1);
+					if (mino.dir == 1) {
+						if (mino.now == 5 || mino.now == 6 || mino.now == 7 || mino.now == 3) {
+							mino.Y -= 1;
+						}
+						if (mino.now == 4) {
+							mino.Y -= 2;
+						}
+					}
+					mino_set(mino.now,1);
+				} else {
+					mino.X = 5;
+					mino.Y = 0;
+					mino.dir = 1;
+					mino.now = n;
+					if (mino.dir == 1) {
+						if (mino.now == 5 || mino.now == 6 || mino.now == 7) {
+							mino.Y -= 1;
+						}
+						if (mino.now == 4) {
+							mino.Y -= 2;
+						}
+					}
+					mino_set(mino.now,1);
+				}
+				nextWhiteEvent();
+			}
+			
+			function mino_set(minos,dir,type) {
+				var X = mino.X;
+				var Y = mino.Y;
+				checked3 = false;
+				switch (minos) {
+					case 1:
+						clear();
+						change(0,5,1);
+						change(0,6,1);
+						change(1,5,1);
+						change(1,6,1);
+						break;
+					case 2:
+						switch (dir) {
+							case 1:
+								check(Y,X+1,2);
+								check(Y+1,X,2);
+								check(Y+1,X+1,2);
+								check(Y+1,X+2,2);
+								if (!checked3) {
+									clear();
+									change(Y,X+1,2);
+									change(Y+1,X,2);
+									change(Y+1,X+1,2);
+									change(Y+1,X+2,2);
+								}
+								break;
+							case 2:
+								check(Y,X+1,2);
+								check(Y+1,X+1,2);
+								check(Y+2,X+1,2);
+								check(Y+1,X+2,2);
+								if (!checked3) {
+									clear();
+									change(Y,X+1,2);
+									change(Y+1,X+1,2);
+									change(Y+2,X+1,2);
+									change(Y+1,X+2,2);
+								}
+								break;
+							case 3:
+								check(Y+1,X,2);
+								check(Y+1,X+1,2);
+								check(Y+2,X+1,2);
+								check(Y+1,X+2,2);
+								if (!checked3) {
+									clear();
+									change(Y+1,X,2);
+									change(Y+1,X+1,2);
+									change(Y+2,X+1,2);
+									change(Y+1,X+2,2);
+								}
+								break;
+							case 4:
+								check(Y+1,X,2);
+								check(Y,X+1,2);
+								check(Y+1,X+1,2);
+								check(Y+2,X+1,2);
+								if (!checked3) {
+									clear();
+									change(Y+1,X,2);
+									change(Y,X+1,2);
+									change(Y+1,X+1,2);
+									change(Y+2,X+1,2);
+								}
+								break;
+						}
+						break;
+					case 3:
+						switch (dir) {
+							case 1:
+								check(Y+1,X,3);
+								check(Y+1,X+1,3);
+								check(Y+1,X+2,3);
+								check(Y+1,X+3,3);
+								if (!checked3) {
+									clear();
+									change(Y+1,X,3);
+									change(Y+1,X+1,3);
+									change(Y+1,X+2,3);
+									change(Y+1,X+3,3);
+								}
+								break;
+							case 2:
+								check(Y,X+2,3);
+								check(Y+1,X+2,3);
+								check(Y+2,X+2,3);
+								check(Y+3,X+2,3);
+								if (!checked3) {
+									clear();
+									change(Y,X+2,3);
+									change(Y+1,X+2,3);
+									change(Y+2,X+2,3);
+									change(Y+3,X+2,3);
+								}
+								break;
+							case 3:
+								check(Y+2,X,3);
+								check(Y+2,X+1,3);
+								check(Y+2,X+2,3);
+								check(Y+2,X+3,3);
+								if (!checked3) {
+									clear();
+									change(Y+2,X,3);
+									change(Y+2,X+1,3);
+									change(Y+2,X+2,3);
+									change(Y+2,X+3,3);
+								}
+								break;
+							case 4:
+								check(Y,X+1,3);
+								check(Y+1,X+1,3);
+								check(Y+2,X+1,3);
+								check(Y+3,X+1,3);
+								if (!checked3) {
+									clear();
+									change(Y,X+1,3);
+									change(Y+1,X+1,3);
+									change(Y+2,X+1,3);
+									change(Y+3,X+1,3);
+								}
+								break;
+						}
+						break;
+					case 4:
+						switch (dir) {
+							case 1:
+								check(Y+2,X,4);
+								check(Y+3,X,4);
+								check(Y+3,X+1,4);
+								check(Y+3,X+2,4);
+								if (!checked3){
+									clear();
+									change(Y+2,X,4);
+									change(Y+3,X,4);
+									change(Y+3,X+1,4);
+									change(Y+3,X+2,4);
+								}
+								break;
+							case 2:
+								check(Y+1,X,4);
+								check(Y+2,X,4);
+								check(Y+3,X,4);
+								check(Y+1,X+1,4);
+								if (!checked3) {
+									clear();
+									change(Y+1,X,4);
+									change(Y+2,X,4);
+									change(Y+3,X,4);
+									change(Y+1,X+1,4);
+								}
+								break;
+							case 3:
+								check(Y+1,X,4);
+								check(Y+1,X+1,4);
+								check(Y+1,X+2,4);
+								check(Y+2,X+2,4);
+								if (!checked3) {
+									clear();
+									change(Y+1,X,4);
+									change(Y+1,X+1,4);
+									change(Y+1,X+2,4);
+									change(Y+2,X+2,4);
+								}
+								break;
+							case 4:
+								check(Y,X+1,4);
+								check(Y+1,X+1,4);
+								check(Y+2,X+1,4);
+								check(Y+2,X,4);
+								if (!checked3) {
+									clear();
+									change(Y,X+1,4);
+									change(Y+1,X+1,4);
+									change(Y+2,X+1,4);
+									change(Y+2,X,4);
+								}
+								break;
+						}
+						break;
+					case 5:
+						switch (dir) {
+							case 1:
+								check(Y+1,X+2,5);
+								check(Y+2,X,5);
+								check(Y+2,X+1,5);
+								check(Y+2,X+2,5);
+								if (!checked3) {
+									clear();
+									change(Y+1,X+2,5);
+									change(Y+2,X,5);
+									change(Y+2,X+1,5);
+									change(Y+2,X+2,5);
+								}
+								break;
+							case 2:
+								check(Y,X+1,5);
+								check(Y+1,X+1,5);
+								check(Y+2,X+1,5);
+								check(Y+2,X+2,5);
+								if (!checked3) {
+									clear();
+									change(Y,X+1,5);
+									change(Y+1,X+1,5);
+									change(Y+2,X+1,5);
+									change(Y+2,X+2,5);
+								}
+								break;
+							case 3:
+								check(Y+1,X,5);
+								check(Y+1,X+1,5);
+								check(Y+1,X+2,5);
+								check(Y+2,X,5);
+								if (!checked3) {
+									clear();
+									change(Y+1,X,5);
+									change(Y+1,X+1,5);
+									change(Y+1,X+2,5);
+									change(Y+2,X,5);
+								}
+								break;
+							case 4:
+								check(Y,X+2,5);
+								check(Y+1,X+2,5);
+								check(Y+2,X+2,5);
+								check(Y,X+1,5);
+								if (!checked3) {
+									clear();
+									change(Y,X+2,5);
+									change(Y+1,X+2,5);
+									change(Y+2,X+2,5);
+									change(Y,X+1,5);
+								}
+								break;
+						}
+						break;
+					case 6:
+						switch (dir) {
+							case 1:
+								check(Y+1,X+2,6);
+								check(Y+1,X+1,6);
+								check(Y+2,X+1,6);
+								check(Y+2,X,6);
+								if (!checked3) {
+									clear();
+									change(Y+1,X+2,6);
+									change(Y+1,X+1,6);
+									change(Y+2,X+1,6);
+									change(Y+2,X,6);
+								}
+								break;
+							case 2:
+								check(Y,X+1,6);
+								check(Y+1,X+1,6);
+								check(Y+1,X+2,6);
+								check(Y+2,X+2,6);
+								if (!checked3) {
+									clear();
+									change(Y,X+1,6);
+									change(Y+1,X+1,6);
+									change(Y+1,X+2,6);
+									change(Y+2,X+2,6);
+								}
+								break;
+							case 3:
+								check(Y+1,X+2,6);
+								check(Y+1,X+1,6);
+								check(Y+2,X+1,6);
+								check(Y+2,X,6);
+								if (!checked3) {
+									clear();
+									change(Y+1,X+2,6);
+									change(Y+1,X+1,6);
+									change(Y+2,X+1,6);
+									change(Y+2,X,6);
+								}
+								break;
+							case 4:
+								check(Y,X+1,6);
+								check(Y+1,X+1,6);
+								check(Y+1,X+2,6);
+								check(Y+2,X+2,6);
+								if (!checked3) {
+									clear();
+									change(Y,X+1,6);
+									change(Y+1,X+1,6);
+									change(Y+1,X+2,6);
+									change(Y+2,X+2,6);
+								}
+								break;
+						}
+						break;
+					case 7:
+						switch (dir) {
+							case 1:
+								check(Y+1,X,7);
+								check(Y+1,X+1,7);
+								check(Y+2,X+1,7);
+								check(Y+2,X+2,7);
+								if (!checked3) {
+									clear();
+									change(Y+1,X,7);
+									change(Y+1,X+1,7);
+									change(Y+2,X+1,7);
+									change(Y+2,X+2,7);
+								}
+								break;
+							case 2:
+								check(Y,X+1,7);
+								check(Y+1,X+1,7);
+								check(Y+1,X,7);
+								check(Y+2,X,7);
+								if (!checked3) {
+									clear();
+									change(Y,X+1,7);
+									change(Y+1,X+1,7);
+									change(Y+1,X,7);
+									change(Y+2,X,7);
+								}
+								break;
+							case 3:
+								check(Y+1,X,7);
+								check(Y+1,X+1,7);
+								check(Y+2,X+1,7);
+								check(Y+2,X+2,7);
+								if (!checked3) {
+									clear();
+									change(Y+1,X,7);
+									change(Y+1,X+1,7);
+									change(Y+2,X+1,7);
+									change(Y+2,X+2,7);
+								}
+								break;
+							case 4:
+								check(Y,X+1,7);
+								check(Y+1,X+1,7);
+								check(Y+1,X,7);
+								check(Y+2,X,7);
+								if (!checked3) {
+									clear();
+									change(Y,X+1,7);
+									change(Y+1,X+1,7);
+									change(Y+1,X,7);
+									change(Y+2,X,7);
+								}
+								break;
+						}
+						break;
+				}
+				console.log(type)
+				if (checked3) {
+					if (type == undefined) {
+						mino.X++;
+						mino_set(mino.now,mino.dir,1);
+					}
+					if (type == 1) {
+						mino.X -= 2;
+						mino_set(mino.now,mino.dir,2);
+					}
+					if (type == 2) {
+						mino.X++;
+						mino.Y++;
+						mino_set(mino.now,mino.dir,3);
+					}
+					if (type == 3) {
+						mino.Y -= 2;
+						mino_set(mino.now,mino.dir,4);
+					}
+					if (type == 4) {
+						if (mino.Dir == 1) {
+							mino.dir--;
+						} else {
+							mino.dir++;
+						}
+						mino_set(mino.now,mino.dir)
+					}
+				}
+			}
+				
+			function check(Y,X) {
+				if (Y < 0)checked3 = true;
+				if (Y > 21)checked3 = true;
+				if (X < 0)checked3 = true;
+				if (X > 12)checked3 = true;
+				if (checked3)return;
+				if (wall[Y][X] != 0) {
+					checked3 = true;
+				}
+			};
+			
+			document.onkeydown = function(e){
+				switch (e.keyCode) {
+					case 32:
+						if (!holdCheck) {
+							holdCheck = true;
+							mino.hold2 = mino.now;
+							if (mino.hold != 0) {
+								mino.now = mino.hold;
+								mino.hold = mino.hold2;
+								clear();
+								newmino(mino.now);
+							} else {
+								mino.hold = mino.hold2;
+								clear();
+								newmino(0);
+							}
+							holdWhite();
+						}
+						break;
+					case 65:
+						left();
+						break;
+					case 68:
+						right();
+						break;
+					case 87:
+						hardDrop();
+						break;
+					case 83:
+						score += 2;
+						softDrop();
+						break;
+					case 37:
+						mino.dir--;
+						mino.Dir = 1;
+						if (mino.dir == 0) {
+							mino.dir = 4;
+						}
+						if (mino.now != 1) {
+							mino_set(mino.now,mino.dir)
+						}
+						break;
+					case 39:
+						mino.dir++;
+						mino.Dir = 0;
+						if (mino.dir == 5) {
+							mino.dir = 1;
+						}
+						if (mino.now != 1) {
+							mino_set(mino.now,mino.dir)
+						}
+						break;
+				}
+			};
+			
+			function change(y,x,color_) {
+				color[y][x] = color_	;
+			}
+			
+			function left() {
+				checkX("-1","0");
+				if (!checked) { 
+					mino.X--;
+					for (var y = 0; y < 21; y++) {
+						for (var x = 0; x < 12; x++) {
+							if (x == 11) {
+								color[y][x] = 0;
+							} else {
+								color[y][x] = color[y][x+1];
+								color[y][x+1] = 0;
+							}
+						}
+					}
+				} else {
+					checked = false;
+				}
+			}
+			
+			function right() {
+				checkX("1");
+				if (!checked) {
+					mino.X++;
+					for (var y = 0; y < 21; y++) {
+						for (var x = 11; x > 0; x--) {
+							if (x == 0) {
+								color[y][x] = 0;
+							} else {
+								color[y][x] = color[y][x-1];
+								color[y][x-1] = 0;
+							}
+						}
+					}
+				} else {
+					checked = false;
+				}
+			}
+			
+			function checkX(n) {
+				n = Number(n);
+				if (n < 0) {
+					n *= -1;
+					for (var y = 0; y < 21; y++) {
+						if (checked) break;
+						for (var x = 0; x < 12; x++) {
+							if (wall[y][x-1] != 0 && color[y][x] != 0 && x > 0) {
+								checked = true;
+								break;
+							}
+						}
+					}
+				} else {
+					for (var y = 0; y < 21; y++) {
+						if (checked) break;
+						for (var x = 0; x < 12; x++) {
+							if (wall[y][x+1] != 0 && color[y][x] != 0 && x < 11) {
+								checked = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+			
+			function checkY() {
+				for (var y = 0; y < 20; y++) {
+					if (checked) break;
+					for (var x = 0; x < 12; x++) {
+						if (wall[y+1][x] != 0 && color[y][x] != 0) {
+							checked = true;
+							break;
+						}
+					}
+				}
+			}
+			
+			function softDrop() {
+				checkY();
+				if (!checked) {
+					checked = false;
+					mino.Y++;
+					for (var y = 20; y > 0; y--) {
+						for (var x = 0; x < 12; x++) {
+							color[y][x] = color[y-1][x];
+							color[y-1][x] = 0;
+						}
+					}
+				} else {
+					for (var y = 0; y < 20; y++) {
+						for (var x = 1; x < 11; x++) {
+							if (color[y][x] != 0 && wall[y][x] == 0) {
+								wall[y][x] = color[y][x];
+								color[y][x] = 0;
+							}
+						}
+					}
+					eraseCheck();
+					checked2 = false;
+					for (var x = 1; x < 11; x++) {
+						if (wall[0][x] != 0) {
+							checked2 = true;
+						}
+					}
+					if (!checked2) {
+						checked2 = false;
+						newmino(0);
+					}
+					holdCheck = false;
+				}
+				checked = false;
+			}
+			
+			function hardDrop() {
+				var downLine = 0;
+				while (!checked) {
+					checkY();
+					if (!checked) {
+						mino.Y++;
+						downLine++;
+						for (var y = 20; y > 0; y--) {
+							for (var x = 0; x < 12; x++) {
+								color[y][x] = color[y-1][x];
+								color[y-1][x] = 0;
+							}
+						}
+					} else {
+						for (var y = 0; y < 20; y++) {
+							for (var x = 1; x < 11; x++) {
+								if (color[y][x] != 0 && wall[y][x] == 0) {
+									wall[y][x] = color[y][x];
+									color[y][x] = 0;
+								}
+							}
+						}
+						score += downLine*2;
+						eraseCheck();
+						checked2 = false;
+						for (var x = 1; x < 11; x++) {
+							if (wall[0][x] != 0) {
+								checked2 = true;
+							}
+						}
+						if (!checked2) {
+							checked2 = false;
+							newmino(0);
+						}
+						holdCheck = false;
+					}	
+				}
+				checked = false;
+			}
+			
+			function eraseCheck() {
+				eraseLine = 0;
+				for (var y = 0; y < 20; y++) {
+					checked2 = true;
+					for (var x = 1; x < 11; x++) {
+						if (wall[y][x] == 0) {
+							checked2 = false;
+						}
+					}
+					if (checked2) {
+						eraseLine++;
+						for (var x = 1; x < 11; x++) {
+							wall[y][x] = 0;
+						}
+						for (var y2 = y; y2 > 0; y2--) {
+							for (var x2 = 1; x2 < 11; x2++) {
+								wall[y2][x2] = wall[y2-1][x2];
+								wall[y2-1][x2] = 0;
+							}
+						}
+					}
+				}
+				score += eraseLine*eraseLine*100;
+				if (eraseLine != 0) {
+					mino.Ren++;
+					score += 50*(mino.Ren-1);
+				} else {
+					mino.Ren = 0;
+				}
+				var checked4 = true;
+				for (var y = 0; y < 20; y++) {
+					for (var x = 0; x <11; x ++){
+						if (wall[y][x] != wallS[y][x]) {
+							checked4 = false;
+						}
+					}
+				}
+				if (checked4) {
+					if (eraseLine == 1) {
+						score += 800;
+					}
+					if (eraseLine == 2) {
+						score += 1000;
+					}
+					if (eraseLine == 3) {
+						score += 1800;
+					}
+					if (eraseLine == 4) {
+						score += 2000;
+					}
+				}
+			}
+			
+			function pos(x,y) {
+				mino.X = x;
+				mino.Y = y;
+			}
+			
+			function holdWhite() {
+				ctx2.clearRect(5,5,95,95);
+				switch(shapeType[mino.hold]) {
+					case "N" :
+						whiteN(2,0);
+						break;
+					case "O" :
+						whiteO(2,0);
+						break;
+					case "T" :
+						whiteT(2,0);
+						break;
+					case "I" :
+						whiteI(2,0);
+						break;
+					case "J" :
+						whiteJ(2,0);
+						break;
+					case "L" :
+						whiteL(2,0);
+						break;
+					case "S" :
+						whiteS(2,0);
+						break;
+					case "Z" :
+						whiteZ(2,0);
+						break;
+				}
+			}
+			
+			function nextWhiteEvent() {
+				ctx3.clearRect(0,5,95,500);
+				for (var i = 0; i < 5; i++) {
+					nextWhite(i);
+				}
+			}
+			
+			function nextWhite(n) {
+				switch(shapeType[mino.next[n]]) {
+					case "N" :
+						whiteN(3,n*68);
+						break;
+					case "O" :
+						whiteO(3,n*68);
+						break;
+					case "T" :
+						whiteT(3,n*68);
+						break;
+					case "I" :
+						whiteI(3,n*68);
+						break;
+					case "J" :
+						whiteJ(3,n*68);
+						break;
+					case "L" :
+						whiteL(3,n*68);
+						break;
+					case "S" :
+						whiteS(3,n*68);
+						break;
+					case "Z" :
+						whiteZ(3,n*68);
+						break;
+				}
+			}
+			
+			function whiteN(type,n) {
+				if (type == 3) {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx3.fillStyle = "#" + colors[mino.shape.N[y][x]];
+							ctx3.fillRect(x*16.66+5,y*16.66+5+n,17,17);
+						}
+					}
+				} else {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx2.fillStyle = "#" + colors[mino.shape.N[y][x]];
+							ctx2.fillRect(x*16.66+5,y*16.66+5,17,17);
+						}
+					}
+				}
+			}
+			function whiteO(type,n) {
+				if (type == 3) {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx3.fillStyle = "#" + colors[mino.shape.O[y][x]];
+							ctx3.fillRect(x*16.66+5,y*16.66+5+n,17,17);
+						}
+					}
+				} else {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx2.fillStyle = "#" + colors[mino.shape.O[y][x]];
+							ctx2.fillRect(x*16.66+5,y*16.66+5,17,17);
+						}
+					}
+				}
+			}
+			function whiteT(type,n) {
+				if (type == 3) {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx3.fillStyle = "#" + colors[mino.shape.T[y][x]];
+							ctx3.fillRect(x*16.66+5,y*16.66+5+n,17,17);
+						}
+					}
+				} else {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx2.fillStyle = "#" + colors[mino.shape.T[y][x]];
+							ctx2.fillRect(x*16.66+5,y*16.66+5,17,17);
+						}
+					}
+				}
+			}
+			function whiteI(type,n) {
+				if (type == 3) {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx3.fillStyle = "#" + colors[mino.shape.I[y][x]];
+							ctx3.fillRect(x*16.66+5,y*16.66+5+n,17,17);
+						}
+					}
+				} else {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx2.fillStyle = "#" + colors[mino.shape.I[y][x]];
+							ctx2.fillRect(x*16.66+5,y*16.66+5,17,17);
+						}
+					}
+				}
+			}
+			function whiteJ(type,n) {
+				if (type == 3) {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx3.fillStyle = "#" + colors[mino.shape.J[y][x]];
+							ctx3.fillRect(x*16.66+5,y*16.66+5+n,17,17);
+						}
+					}
+				} else {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx2.fillStyle = "#" + colors[mino.shape.J[y][x]];
+							ctx2.fillRect(x*16.66+5,y*16.66+5,17,17);
+						}
+					}
+				}
+			}
+			function whiteL(type,n) {
+				if (type == 3) {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx3.fillStyle = "#" + colors[mino.shape.L[y][x]];
+							ctx3.fillRect(x*16.66+5,y*16.66+5+n,17,17);
+						}
+					}
+				} else {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx2.fillStyle = "#" + colors[mino.shape.L[y][x]];
+							ctx2.fillRect(x*16.66+5,y*16.66+5,17,17);
+						}
+					}
+				}
+			}
+			function whiteS(type,n) {
+				if (type == 3) {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx3.fillStyle = "#" + colors[mino.shape.S[y][x]];
+							ctx3.fillRect(x*16.66+5,y*16.66+5+n,17,17);
+						}
+					}
+				} else {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx2.fillStyle = "#" + colors[mino.shape.S[y][x]];
+							ctx2.fillRect(x*16.66+5,y*16.66+5,17,17);
+						}
+					}
+				}
+			}
+			function whiteZ(type,n) {
+				if (type == 3) {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx3.fillStyle = "#" + colors[mino.shape.Z[y][x]];
+							ctx3.fillRect(x*16.66+5,y*16.66+5+n,17,17);
+						}
+					}
+				} else {
+					for (var y = 0; y < 6; y++) {
+						for (var x = 0; x < 6; x++) {
+							ctx2.fillStyle = "#" + colors[mino.shape.Z[y][x]];
+							ctx2.fillRect(x*16.66+5,y*16.66+5,17,17);
+						}
+					}
+				}
+			}
+			
+			function white() {
+				ctx.clearRect(0,0,300,600);
+				for (var y = 0; y < 21; y++) {
+					for (var x = 0; x < 12; x++) {
+						if (wall[y][x+1] != 0) {
+							ctx.fillStyle = "#"+colors[wall[y][x+1]];
+						} else {
+							ctx.fillStyle = "#"+colors[color[y][x+1]];
+						}
+						ctx.fillRect(x*30+0.5,y*30+0.5,29,29);
+					}
+				}	
+			}
+			
+			function scoreWhite() {
+				var scoreCopy = score;
+				ctx4.clearRect(0,0,600,60);
+				while (scoreCopy.length != 7) {
+					scoreCopy = "a"+ "" + scoreCopy;
+				}
+				for (var n = 0; n < 7; n++){
+					for (var i = 0; i < 15; i++) {
+						if (scoreCopy.substr(n,1) == "a") {
+							ctx4.fillStyle ="#" + colors[textDeta[0][i]];
+							ctx4.fillRect((i%3)*10+n*40,Math.floor(i/3)*10+5,10,10);
+						} else {
+							ctx4.fillStyle ="#" + colors[textDeta[Number(scoreCopy.substr(n,1))][i]];
+							ctx4.fillRect((i%3)*10+n*40,Math.floor(i/3)*10+5,10,10);
+						}
+					}
+				}
+			}
+			
+			function clear() {
+				for (var y = 0; y < 21; y++) {
+					for (var x = 0; x < 12; x++) {
+						color[y][x] = 0;
+					}
+				}
+			}
+			
+			setInterval("white()",10);
+			setInterval("scoreWhite()",10);
+			setInterval("FramePerSeconds()",50);
+			
+			function FramePerSeconds() {
+				frame++;
+				if (fps == 940) fps = 700;
+				if (frame > fps/50) {
+					fps -= 1;
+					frame = 0;
+					softDrop();
+				}
+			}
+		</script>
+	</body>
+</html>
